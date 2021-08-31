@@ -6,6 +6,8 @@
  */
 package io.github.guisso.livros.entidade;
 
+import java.util.Objects;
+
 /**
  *
  * @author Luis Guisso <luis dot guisso at ifnmg dot edu dot br>
@@ -27,6 +29,30 @@ public class Autor extends Entidade {
     }
     //</editor-fold>
 
+    /**
+     * Método requerido para a seleção dos múltiplos autores ligados
+     * a um livro em uma lista na GUI. O que torna dois objetos idênticos
+     * é o nome do autor, que deve ser único no banco de dados.
+     * 
+     * @param obj Objeto a ser comparado.
+     * @return Identificação entre objetos.
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Autor other = (Autor) obj;
+        return Objects.equals(this.nome, other.nome);
+    }
+
+    
     @Override
     public String toString() {
         return nome;
