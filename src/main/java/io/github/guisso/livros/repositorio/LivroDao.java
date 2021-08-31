@@ -148,11 +148,13 @@ public class LivroDao extends AbstractDao<Livro, Long> {
             Long editoraId = resultSet.getLong("editora_id");
             livro.setEditora(new EditoraDao().localizarPorId(editoraId));
 
-            // TODO Localizar apenas os autores de um livro específico
-            livro.setAutores(new AutorDao().localizarTodos());
+            // Localizar apenas os autores de um livro específico
+            livro.setAutores(new AutorLivroDao()
+                    .localizarAutoresPorLivro(livro));
 
-            // TODO Localizar apenas os comentários de um livro específico
-            livro.setComentarios(new ComentarioDao().localizarTodos());
+            // Localizar apenas os comentários de um livro específico
+            livro.setComentarios(new ComentarioDao()
+                    .localizarComentariosPorLivro(livro));
 
             // A id do comentário (relacionamento um-para-um) é a mesma
             // do próprio livro
