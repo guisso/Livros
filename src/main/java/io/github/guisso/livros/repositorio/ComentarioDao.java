@@ -7,6 +7,7 @@
 package io.github.guisso.livros.repositorio;
 
 import io.github.guisso.livros.entidade.Comentario;
+import io.github.guisso.livros.entidade.Livro;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -23,6 +24,42 @@ import java.util.logging.Logger;
  */
 public class ComentarioDao extends AbstractDao<Comentario, Long> {
 
+    /**
+     * Recupera todos os objetos mapeados para o banco de dados do tipo
+     * específico.
+     *
+     * @return Lista (geralmente um <code>ArrayList<T></code>) de objetos
+     * persistidos.
+     */
+    public List<Comentario> localizarComentariosPorLivro(Livro livro) {
+
+        // Declara referência para reter o(s) objeto(s) a ser(em) recuperado(s)
+        List<Comentario> comentarios = new ArrayList<>();
+
+        // Tenta preparar uma sentença SQL para a conexão já estabelecida
+        try (PreparedStatement pstmt
+                = ConexaoBd.getConexao().prepareStatement(
+                        // Sentença SQL para recuperação de todos os registros
+                        getDeclaracaoSelectComentariosPorLivro())) {
+            
+            // Prepara a consulta com os parâmetros adequados
+            pstmt.setLong(1, livro.getId());
+            
+            // Executa o comando SQL
+            ResultSet resultSet = pstmt.executeQuery();
+
+            // Extrai objeto(s) do(s) respectivo(s) registro(s) do banco de dados
+            comentarios = extrairObjetos(resultSet);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        // Devolve uma lista vazia (nenhum registro encontrado) 
+        // ou a relação de objeto(s) recuperado(s)
+        return comentarios;
+    }
+    
     /**
      * Recupera a sentença SQL específica para a inserção da entidade no banco
      * de dados.
@@ -55,6 +92,17 @@ public class ComentarioDao extends AbstractDao<Comentario, Long> {
     public String getDeclaracaoSelectTodos() {
         return "SELECT * FROM comentario";
     }
+    
+    /**
+     * Recupera a sentença SQL específica para a busca das entidades no banco de
+     * dados.
+     *
+     * @return Sentença SQl para busca por entidades.
+     */
+    private String getDeclaracaoSelectComentariosPorLivro() {
+        return "SELECT * FROM comentario WHERE livro_id = ?";
+    }
+
 
     /**
      * Recupera a sentença SQL específica para a atualização da entidade no
@@ -170,5 +218,5 @@ public class ComentarioDao extends AbstractDao<Comentario, Long> {
         // de dados
         return comentarios;
     }
-
+    
 }
