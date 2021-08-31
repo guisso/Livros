@@ -6,6 +6,10 @@
  */
 package io.github.guisso.livros.gui;
 
+import io.github.guisso.livros.entidade.Autor;
+import io.github.guisso.livros.entidade.Comentario;
+import io.github.guisso.livros.entidade.Livro;
+import io.github.guisso.livros.repositorio.LivroDao;
 import java.beans.PropertyVetoException;
 import java.util.Arrays;
 import java.util.logging.Level;
@@ -85,8 +89,18 @@ public class JanelaPrincipal extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void mnuCadastroLivroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuCadastroLivroActionPerformed
+        // TODO Testes com edição de um livro específico
+        Livro livro = new LivroDao().localizarPorId(7L);
+        
+//        for (Autor autor : livro.getAutores()) {
+//            System.out.println(".. " + autor);
+//        }
+//        for (Comentario comentario : livro.getComentarios()) {
+//            System.out.println(",, " + comentario);
+//        }
+        
         // Recupera uma instância visível e não-iconficada da janela
-        CadastroLivro interna = CadastroLivro.getInstance();
+        CadastroLivro interna = CadastroLivro.getInstance(livro);
 
         // Se a janela ainda não foi adicionada à área de trabalho...
         if (!Arrays
@@ -101,7 +115,7 @@ public class JanelaPrincipal extends javax.swing.JFrame {
 
     /**
      * Reuso de funcionalidade de exibição de janela interna.
-     * 
+     *
      * @param janela Janela interna a ser ajustada
      */
     private void tornarVisivel(JInternalFrame janela) {
@@ -132,7 +146,7 @@ public class JanelaPrincipal extends javax.swing.JFrame {
      * @param args the command line arguments
      */
     public static void main(String args[]) {
-        
+
         // Flat Darcula LaF Theme
         try {
             UIManager.setLookAndFeel(new com.formdev.flatlaf.FlatDarculaLaf());
