@@ -7,12 +7,17 @@
 package io.github.guisso.livros.gui;
 
 import io.github.guisso.livros.entidade.Autor;
+import io.github.guisso.livros.entidade.AutorLivro;
 import io.github.guisso.livros.entidade.Comentario;
 import io.github.guisso.livros.entidade.Editora;
 import io.github.guisso.livros.entidade.Livro;
+import io.github.guisso.livros.entidade.Resenha;
 import io.github.guisso.livros.gui.mycomponent.CheckboxListCellRenderer;
 import io.github.guisso.livros.repositorio.AutorDao;
+import io.github.guisso.livros.repositorio.AutorLivroDao;
 import io.github.guisso.livros.repositorio.EditoraDao;
+import io.github.guisso.livros.repositorio.LivroDao;
+import io.github.guisso.livros.repositorio.ResenhaDao;
 import java.util.List;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
@@ -26,6 +31,8 @@ import javax.swing.JList;
 public class CadastroLivro extends javax.swing.JInternalFrame {
 
     private static CadastroLivro self;
+
+    private Livro livroEdicao;
 
     private List<Editora> todasEditoras;
     private List<Autor> todosAutores;
@@ -53,33 +60,29 @@ public class CadastroLivro extends javax.swing.JInternalFrame {
     /**
      * Creates new form CadastroLivro with a book filled
      *
-     * @param livro
+     * @param livroEdicao
      */
-    private CadastroLivro(Livro livro) {
+    private CadastroLivro(Livro livroEdicao) {
         this();
 
-        txtTitulo.setText(livro.getTitulo());
-        txtAssunto.setText(livro.getAssunto());
-        txtEdicao.setText(livro.getEdicao().toString());
-        txtLocalPublicacao.setText(livro.getLocalPublicacao());
-        txtAnoPublicacao.setText(livro.getAnoPublicacao().toString());
-        txtExtensao.setText(livro.getExtensao().toString());
-        txtResenha.setText(livro.getResenha().getTexto());
-        
+        this.livroEdicao = livroEdicao;
+
+        txtTitulo.setText(livroEdicao.getTitulo());
+        txtAssunto.setText(livroEdicao.getAssunto());
+        txtEdicao.setText(livroEdicao.getEdicao().toString());
+        txtLocalPublicacao.setText(livroEdicao.getLocalPublicacao());
+        txtAnoPublicacao.setText(livroEdicao.getAnoPublicacao().toString());
+        txtExtensao.setText(livroEdicao.getExtensao().toString());
+        txtResenha.setText(livroEdicao.getResenha().getTexto());
+
         cboEditora.getModel().setSelectedItem(
-                livro.getEditora());
+                livroEdicao.getEditora());
 
         // Pré-seleção de autores do livro corrente
-        setSelectedValues(lstAutor, livro.getAutores());
-        
-        todasEditoras = new EditoraDao().localizarTodos();
-        DefaultComboBoxModel<Editora> comboBoxModel
-                = new DefaultComboBoxModel<Editora>();
-        comboBoxModel.addAll(todasEditoras);
-        cboEditora.setModel(comboBoxModel);
-        
+        setSelectedValues(lstAutor, livroEdicao.getAutores());
+
         DefaultListModel<Comentario> comentariosListModel = new DefaultListModel<>();
-        comentariosListModel.addAll(livro.getComentarios());
+        comentariosListModel.addAll(livroEdicao.getComentarios());
         lstComentarios.setModel(comentariosListModel);
     }
 
@@ -114,7 +117,7 @@ public class CadastroLivro extends javax.swing.JInternalFrame {
 
     /**
      * Pré-seleciona os autores contido na listagem da GUI.
-     * 
+     *
      * @param list Componente gráfico JList.
      * @param autores Lista de autores a serem selecionados.
      */
@@ -211,6 +214,11 @@ public class CadastroLivro extends javax.swing.JInternalFrame {
 
         btnSalvar.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         btnSalvar.setText("Salvar");
+        btnSalvar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSalvarActionPerformed(evt);
+            }
+        });
 
         bntCancelar.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         bntCancelar.setText("Cancelar");
@@ -413,6 +421,65 @@ public class CadastroLivro extends javax.swing.JInternalFrame {
     private void bntCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bntCancelarActionPerformed
         dispose();
     }//GEN-LAST:event_bntCancelarActionPerformed
+
+    private void btnSalvarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSalvarActionPerformed
+        Livro livro = new Livro();
+        
+        // Mantém as listas de autores e comentários antes da edição
+        if (livroEdicao != null) {
+            livro = livroEdicao;
+        }
+
+        // Dados básicos
+        livro.setTitulo(txtTitulo.getText());
+        livro.setAssunto(txtAssunto.getText());
+        livro.setEdicao(Byte.valueOf(txtEdicao.getText()));
+        livro.setLocalPublicacao(txtLocalPublicacao.getText());
+        livro.setAnoPublicacao(Short.valueOf(txtAnoPublicacao.getText()));
+        livro.setExtensao(Short.valueOf(txtExtensao.getText()));
+        livro.setEditora((Editora) cboEditora.getSelectedItem());
+
+        Long livroId = new LivroDao().salvar(livro);
+        livro.setId(livroId);
+
+        // Resenha
+        Resenha resenha = new Resenha(txtResenha.getText());
+        resenha.setId(livroId);
+        
+        new ResenhaDao().salvar(resenha);
+
+        // Autores selecionados para ligação ao livro
+        List<Autor> autoresSelecionados = lstAutor.getSelectedValuesList();
+
+        // Exclusão de autores do livro
+        for (Autor autor : livro.getAutores()) {
+            if (!autoresSelecionados.contains(autor)) {
+                new AutorLivroDao().excluir(
+                        new AutorLivro(autor.getId(), livro.getId()));
+            }
+        }
+
+        // Inclusão de autores do livro
+        // O método salvar somente insere valores não pré-existentes no
+        // banco de dados ao custo de uma consulta a cada nova tentativa
+        // de inserção.
+//        for (Autor autor : autores) {
+//            new AutorLivroDao().salvar(
+//                    new AutorLivro(autor.getId(), livro.getId()));
+//        }
+
+        // Alternativamente, pode-se verificar se o autor não está ligado
+        // ao livro antes de sua inserção, economizando-se algumas
+        // consultas, ou seja, menor desperdício de processamento.
+        for (Autor autorSelecionado : autoresSelecionados) {
+            if (!livro.getAutores().contains(autorSelecionado)) {
+                new AutorLivroDao().salvar(
+                        new AutorLivro(autorSelecionado.getId(),
+                                livro.getId()));
+            }
+        }
+
+    }//GEN-LAST:event_btnSalvarActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
