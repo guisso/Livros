@@ -6,11 +6,17 @@
  */
 package io.github.guisso.livros.gui;
 
+import io.github.guisso.livros.entidade.Autor;
+import io.github.guisso.livros.entidade.Comentario;
 import io.github.guisso.livros.entidade.Editora;
 import io.github.guisso.livros.entidade.Livro;
+import io.github.guisso.livros.gui.mycomponent.CheckboxListCellRenderer;
+import io.github.guisso.livros.repositorio.AutorDao;
 import io.github.guisso.livros.repositorio.EditoraDao;
 import java.util.List;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.DefaultListModel;
+import javax.swing.JList;
 
 /**
  *
@@ -18,61 +24,109 @@ import javax.swing.DefaultComboBoxModel;
  * @version 0.0.1, 27/08/2021
  */
 public class CadastroLivro extends javax.swing.JInternalFrame {
-    
+
     private static CadastroLivro self;
-    
+
     private List<Editora> todasEditoras;
+    private List<Autor> todosAutores;
 
     /**
      * Creates new form CadastroLivro
      */
     private CadastroLivro() {
         initComponents();
-        
+
+        // Preenchimento de editoras para seleção no cadastro
         todasEditoras = new EditoraDao().localizarTodos();
-        cboEditora.setModel(
-                new DefaultComboBoxModel<Editora>(
-                        todasEditoras.toArray(
-                                new Editora[todasEditoras.size()])));
+        DefaultComboBoxModel<Editora> comboBoxModel
+                = new DefaultComboBoxModel<Editora>();
+        comboBoxModel.addAll(todasEditoras);
+        cboEditora.setModel(comboBoxModel);
+
+        // Preenchimento de autores para seleção no cadastro
+        todosAutores = new AutorDao().localizarTodos();
+        DefaultListModel<Autor> listModel = new DefaultListModel<Autor>();
+        listModel.addAll(todosAutores);
+        lstAutor.setModel(listModel);
     }
-    
+
     /**
      * Creates new form CadastroLivro with a book filled
-     * @param livro 
+     *
+     * @param livro
      */
     private CadastroLivro(Livro livro) {
         this();
+
+        txtTitulo.setText(livro.getTitulo());
+        txtAssunto.setText(livro.getAssunto());
+        txtEdicao.setText(livro.getEdicao().toString());
+        txtLocalPublicacao.setText(livro.getLocalPublicacao());
+        txtAnoPublicacao.setText(livro.getAnoPublicacao().toString());
+        txtExtensao.setText(livro.getExtensao().toString());
+        txtResenha.setText(livro.getResenha().getTexto());
         
-        cboEditora.getModel().setSelectedItem(livro.getEditora());
+        cboEditora.getModel().setSelectedItem(
+                livro.getEditora());
+
+        // Pré-seleção de autores do livro corrente
+        setSelectedValues(lstAutor, livro.getAutores());
+        
+        todasEditoras = new EditoraDao().localizarTodos();
+        DefaultComboBoxModel<Editora> comboBoxModel
+                = new DefaultComboBoxModel<Editora>();
+        comboBoxModel.addAll(todasEditoras);
+        cboEditora.setModel(comboBoxModel);
+        
+        DefaultListModel<Comentario> comentariosListModel = new DefaultListModel<>();
+        comentariosListModel.addAll(livro.getComentarios());
+        lstComentarios.setModel(comentariosListModel);
     }
-    
+
     /**
      * Give access to a unique instance of the class.
-     * 
+     *
      * @return The unique form
      */
     public static CadastroLivro getInstance() {
         // Caso a janela ainda não tenha sido instanciada
-        if(self == null) {
+        if (self == null) {
             self = new CadastroLivro();
         }
-        
+
         return self;
     }
-    
+
     /**
      * Give access to a unique instance of the class with a book filled.
-     * 
+     *
      * @param livro
      * @return The unique form
      */
     public static CadastroLivro getInstance(Livro livro) {
         // Caso a janela ainda não tenha sido instanciada
-        if(self == null) {
+        if (self == null) {
             self = new CadastroLivro(livro);
         }
-        
+
         return self;
+    }
+
+    /**
+     * Pré-seleciona os autores contido na listagem da GUI.
+     * 
+     * @param list Componente gráfico JList.
+     * @param autores Lista de autores a serem selecionados.
+     */
+    protected void setSelectedValues(JList list, List<Autor> autores) {
+        list.clearSelection();
+        for (Autor autor : autores) {
+            int index = ((DefaultListModel) list.getModel()).indexOf(autor);
+            if (index >= 0) {
+                list.addSelectionInterval(index, index);
+            }
+        }
+        list.ensureIndexIsVisible(list.getSelectedIndex());
     }
 
     /**
@@ -96,18 +150,21 @@ public class CadastroLivro extends javax.swing.JInternalFrame {
         lblExtensao = new javax.swing.JLabel();
         txtTitulo = new javax.swing.JTextField();
         txtAssunto = new javax.swing.JTextField();
-        txtEdicacao = new javax.swing.JTextField();
+        txtEdicao = new javax.swing.JTextField();
         txtLocalPublicacao = new javax.swing.JTextField();
         txtAnoPublicacao = new javax.swing.JTextField();
         txtExtensao = new javax.swing.JTextField();
         btnSalvar = new javax.swing.JButton();
         bntCancelar = new javax.swing.JButton();
+        pnlAutor = new javax.swing.JPanel();
+        scrAutor = new javax.swing.JScrollPane();
+        lstAutor = new javax.swing.JList<>();
         pnlResenha = new javax.swing.JPanel();
         scrResenha = new javax.swing.JScrollPane();
         txtResenha = new javax.swing.JTextArea();
         pnlComentarios = new javax.swing.JPanel();
         scrComentarios = new javax.swing.JScrollPane();
-        jList1 = new javax.swing.JList<>();
+        lstComentarios = new javax.swing.JList<>();
         scrComantarioSelecionado = new javax.swing.JScrollPane();
         txtComentarioSelecionado = new javax.swing.JTextArea();
 
@@ -144,7 +201,7 @@ public class CadastroLivro extends javax.swing.JInternalFrame {
 
         txtAssunto.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
 
-        txtEdicacao.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        txtEdicao.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
 
         txtLocalPublicacao.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
 
@@ -174,7 +231,7 @@ public class CadastroLivro extends javax.swing.JInternalFrame {
                         .addComponent(txtAssunto, javax.swing.GroupLayout.PREFERRED_SIZE, 384, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
                         .addGroup(pnlLivroLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(txtEdicacao, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(txtEdicao, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(pnlLivroLayout.createSequentialGroup()
                                 .addComponent(bntCancelar, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(18, 18, 18)
@@ -228,7 +285,7 @@ public class CadastroLivro extends javax.swing.JInternalFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(pnlLivroLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(txtAssunto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtEdicacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(txtEdicao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(pnlLivroLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lblLocalPublicacao)
@@ -248,8 +305,35 @@ public class CadastroLivro extends javax.swing.JInternalFrame {
 
         tabLivro.addTab("Livro", pnlLivro);
 
+        scrAutor.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+
+        lstAutor.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        lstAutor.setCellRenderer(new CheckboxListCellRenderer<Autor>());
+        scrAutor.setViewportView(lstAutor);
+
+        javax.swing.GroupLayout pnlAutorLayout = new javax.swing.GroupLayout(pnlAutor);
+        pnlAutor.setLayout(pnlAutorLayout);
+        pnlAutorLayout.setHorizontalGroup(
+            pnlAutorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlAutorLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(scrAutor, javax.swing.GroupLayout.DEFAULT_SIZE, 725, Short.MAX_VALUE))
+        );
+        pnlAutorLayout.setVerticalGroup(
+            pnlAutorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlAutorLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(scrAutor, javax.swing.GroupLayout.DEFAULT_SIZE, 257, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+
+        tabLivro.addTab("Autores", pnlAutor);
+
         txtResenha.setColumns(20);
+        txtResenha.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        txtResenha.setLineWrap(true);
         txtResenha.setRows(5);
+        txtResenha.setWrapStyleWord(true);
         scrResenha.setViewportView(txtResenha);
 
         javax.swing.GroupLayout pnlResenhaLayout = new javax.swing.GroupLayout(pnlResenha);
@@ -273,11 +357,14 @@ public class CadastroLivro extends javax.swing.JInternalFrame {
 
         pnlComentarios.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
 
-        jList1.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
-        scrComentarios.setViewportView(jList1);
+        lstComentarios.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        scrComentarios.setViewportView(lstComentarios);
 
         txtComentarioSelecionado.setColumns(20);
+        txtComentarioSelecionado.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        txtComentarioSelecionado.setLineWrap(true);
         txtComentarioSelecionado.setRows(5);
+        txtComentarioSelecionado.setWrapStyleWord(true);
         scrComantarioSelecionado.setViewportView(txtComentarioSelecionado);
 
         javax.swing.GroupLayout pnlComentariosLayout = new javax.swing.GroupLayout(pnlComentarios);
@@ -286,9 +373,9 @@ public class CadastroLivro extends javax.swing.JInternalFrame {
             pnlComentariosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pnlComentariosLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(scrComentarios, javax.swing.GroupLayout.PREFERRED_SIZE, 123, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(scrComantarioSelecionado, javax.swing.GroupLayout.DEFAULT_SIZE, 590, Short.MAX_VALUE)
+                .addComponent(scrComentarios, javax.swing.GroupLayout.DEFAULT_SIZE, 187, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(scrComantarioSelecionado, javax.swing.GroupLayout.PREFERRED_SIZE, 520, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
         pnlComentariosLayout.setVerticalGroup(
@@ -296,8 +383,8 @@ public class CadastroLivro extends javax.swing.JInternalFrame {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlComentariosLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(pnlComentariosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(scrComantarioSelecionado)
-                    .addComponent(scrComentarios, javax.swing.GroupLayout.DEFAULT_SIZE, 257, Short.MAX_VALUE))
+                    .addComponent(scrComantarioSelecionado, javax.swing.GroupLayout.DEFAULT_SIZE, 257, Short.MAX_VALUE)
+                    .addComponent(scrComentarios))
                 .addContainerGap())
         );
 
@@ -332,7 +419,6 @@ public class CadastroLivro extends javax.swing.JInternalFrame {
     private javax.swing.JButton bntCancelar;
     private javax.swing.JButton btnSalvar;
     private javax.swing.JComboBox<Editora> cboEditora;
-    private javax.swing.JList<Comentario> jList1;
     private javax.swing.JLabel lblAnoPublicacao;
     private javax.swing.JLabel lblAssunto;
     private javax.swing.JLabel lblEdicacao;
@@ -340,9 +426,13 @@ public class CadastroLivro extends javax.swing.JInternalFrame {
     private javax.swing.JLabel lblExtensao;
     private javax.swing.JLabel lblLocalPublicacao;
     private javax.swing.JLabel lblTitulo;
+    private javax.swing.JList<Autor> lstAutor;
+    private javax.swing.JList<Comentario> lstComentarios;
+    private javax.swing.JPanel pnlAutor;
     private javax.swing.JPanel pnlComentarios;
     private javax.swing.JPanel pnlLivro;
     private javax.swing.JPanel pnlResenha;
+    private javax.swing.JScrollPane scrAutor;
     private javax.swing.JScrollPane scrComantarioSelecionado;
     private javax.swing.JScrollPane scrComentarios;
     private javax.swing.JScrollPane scrResenha;
@@ -350,7 +440,7 @@ public class CadastroLivro extends javax.swing.JInternalFrame {
     private javax.swing.JTextField txtAnoPublicacao;
     private javax.swing.JTextField txtAssunto;
     private javax.swing.JTextArea txtComentarioSelecionado;
-    private javax.swing.JTextField txtEdicacao;
+    private javax.swing.JTextField txtEdicao;
     private javax.swing.JTextField txtExtensao;
     private javax.swing.JTextField txtLocalPublicacao;
     private javax.swing.JTextArea txtResenha;
