@@ -31,10 +31,16 @@ public class Util {
         if (data == null) {
             return LocalDate.now();
         }
-
-        return data.toInstant()
+        
+        return new Date(data.getTime())
+                .toInstant()
                 .atZone(ZoneId.systemDefault())
                 .toLocalDate();
+
+
+//        return data.toInstant()
+//                .atZone(ZoneId.systemDefault())
+//                .toLocalDate();
     }
 
     /**
@@ -50,8 +56,13 @@ public class Util {
             return LocalDateTime.now();
         }
 
-        return data.toInstant()
+        return new Date(data.getTime())
+                .toInstant()
                 .atZone(ZoneId.systemDefault())
                 .toLocalDateTime();
+        
+//        return data.toInstant()
+//                .atZone(ZoneId.systemDefault())
+//                .toLocalDateTime();
     }
 }
