@@ -6,14 +6,13 @@
  */
 package io.github.guisso.livros.gui;
 
-import io.github.guisso.livros.entidade.Autor;
-import io.github.guisso.livros.entidade.Comentario;
 import io.github.guisso.livros.entidade.Livro;
 import io.github.guisso.livros.repositorio.LivroDao;
 import java.beans.PropertyVetoException;
 import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
 import javax.swing.UIManager;
 
@@ -46,6 +45,7 @@ public class JanelaPrincipal extends javax.swing.JFrame {
         mnuCadastroLivro = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
 
         javax.swing.GroupLayout dskPrincipalLayout = new javax.swing.GroupLayout(dskPrincipal);
         dskPrincipal.setLayout(dskPrincipalLayout);
