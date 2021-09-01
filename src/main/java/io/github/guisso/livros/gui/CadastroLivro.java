@@ -18,6 +18,7 @@ import io.github.guisso.livros.repositorio.AutorLivroDao;
 import io.github.guisso.livros.repositorio.EditoraDao;
 import io.github.guisso.livros.repositorio.LivroDao;
 import io.github.guisso.livros.repositorio.ResenhaDao;
+import java.util.ArrayList;
 import java.util.List;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
@@ -46,13 +47,13 @@ public class CadastroLivro extends javax.swing.JInternalFrame {
         // Preenchimento de editoras para seleção no cadastro
         todasEditoras = new EditoraDao().localizarTodos();
         DefaultComboBoxModel<Editora> comboBoxModel
-                = new DefaultComboBoxModel<Editora>();
+                = new DefaultComboBoxModel<>();
         comboBoxModel.addAll(todasEditoras);
         cboEditora.setModel(comboBoxModel);
 
         // Preenchimento de autores para seleção no cadastro
         todosAutores = new AutorDao().localizarTodos();
-        DefaultListModel<Autor> listModel = new DefaultListModel<Autor>();
+        DefaultListModel<Autor> listModel = new DefaultListModel<>();
         listModel.addAll(todosAutores);
         lstAutor.setModel(listModel);
     }
@@ -424,7 +425,9 @@ public class CadastroLivro extends javax.swing.JInternalFrame {
 
     private void btnSalvarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSalvarActionPerformed
         Livro livro = new Livro();
-        
+        livro.setAutores(new ArrayList<>());
+        livro.setComentarios(new ArrayList<>());
+
         // Mantém as listas de autores e comentários antes da edição
         if (livroEdicao != null) {
             livro = livroEdicao;
@@ -445,7 +448,7 @@ public class CadastroLivro extends javax.swing.JInternalFrame {
         // Resenha
         Resenha resenha = new Resenha(txtResenha.getText());
         resenha.setId(livroId);
-        
+
         new ResenhaDao().salvar(resenha);
 
         // Autores selecionados para ligação ao livro
@@ -463,11 +466,12 @@ public class CadastroLivro extends javax.swing.JInternalFrame {
         // O método salvar somente insere valores não pré-existentes no
         // banco de dados ao custo de uma consulta a cada nova tentativa
         // de inserção.
+//
 //        for (Autor autor : autores) {
 //            new AutorLivroDao().salvar(
 //                    new AutorLivro(autor.getId(), livro.getId()));
 //        }
-
+//
         // Alternativamente, pode-se verificar se o autor não está ligado
         // ao livro antes de sua inserção, economizando-se algumas
         // consultas, ou seja, menor desperdício de processamento.
@@ -479,8 +483,27 @@ public class CadastroLivro extends javax.swing.JInternalFrame {
             }
         }
 
+        limparCampos();
+
     }//GEN-LAST:event_btnSalvarActionPerformed
 
+    private void limparCampos() {
+        livroEdicao = null;
+
+        txtTitulo.setText(null);
+        txtAssunto.setText(null);
+        txtEdicao.setText(null);
+        txtLocalPublicacao.setText(null);
+        txtAnoPublicacao.setText(null);
+        txtExtensao.setText(null);
+        txtResenha.setText(null);
+
+        cboEditora.getModel().setSelectedItem(null);
+
+        lstAutor.setSelectedValue(null, true);
+
+        lstComentarios.setModel(new DefaultListModel<>());
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton bntCancelar;
