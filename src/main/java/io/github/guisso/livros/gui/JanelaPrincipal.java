@@ -90,14 +90,8 @@ public class JanelaPrincipal extends javax.swing.JFrame {
 
     private void mnuCadastroLivroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuCadastroLivroActionPerformed
         // TODO Testes com edição de um livro específico
-        Livro livro = new LivroDao().localizarPorId(7L);
+        Livro livro = new LivroDao().localizarPorId(9L);
         
-//        for (Autor autor : livro.getAutores()) {
-//            System.out.println(".. " + autor);
-//        }
-//        for (Comentario comentario : livro.getComentarios()) {
-//            System.out.println(",, " + comentario);
-//        }
         
         // Recupera uma instância visível e não-iconficada da janela
         CadastroLivro interna = CadastroLivro.getInstance(livro);
