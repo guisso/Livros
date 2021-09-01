@@ -15,10 +15,16 @@ public class Resenha extends Entidade {
 
     private static final int MAX_LENGTH = 2000;
     private String texto;
+    
+    //<editor-fold defaultstate="collapsed" desc="Constructors">
+    public Resenha() {
+        
+    }
 
     public Resenha(String texto) {
         this.texto = texto;
     }
+    //</editor-fold>
 
     //<editor-fold defaultstate="collapsed" desc="Getters/Setters">
     public String getTexto() {
