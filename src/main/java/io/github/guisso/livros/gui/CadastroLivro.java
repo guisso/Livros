@@ -31,7 +31,7 @@ import javax.swing.JList;
  */
 public class CadastroLivro extends javax.swing.JInternalFrame {
 
-    private static CadastroLivro self;
+    private static CadastroLivro instance;
 
     private Livro livroEdicao;
 
@@ -97,13 +97,13 @@ public class CadastroLivro extends javax.swing.JInternalFrame {
      */
     public static CadastroLivro getInstance() {
         // Caso a janela ainda não tenha sido instanciada
-        if (self == null) {
-            self = new CadastroLivro();
+        if (instance == null) {
+            instance = new CadastroLivro();
         }
         
         // TODO Carga de todas editoras e todos autores
 
-        return self;
+        return instance;
     }
 
     /**
@@ -116,16 +116,16 @@ public class CadastroLivro extends javax.swing.JInternalFrame {
         // TODO Carga de todas editoras e todos autores
         
         // Caso a janela ainda não tenha sido instanciada
-        if (self == null) {
-            self = new CadastroLivro(livro);
+        if (instance == null) {
+            instance = new CadastroLivro(livro);
         } else {
             // Correção de bug: o livro deve ser sempre atribuído 
             // à instância existente para que a edição ocorra de 
             // maneira adequada
-            self.livroEdicao = livro;
+            instance.livroEdicao = livro;
         }
 
-        return self;
+        return instance;
     }
 
     /**
