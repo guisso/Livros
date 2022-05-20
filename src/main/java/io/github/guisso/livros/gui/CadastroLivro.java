@@ -53,7 +53,8 @@ public class CadastroLivro extends javax.swing.JInternalFrame {
 
         // Preenchimento de autores para seleção no cadastro
         todosAutores = new AutorDao().localizarTodos();
-        DefaultListModel<Autor> listModel = new DefaultListModel<>();
+        DefaultListModel<Autor> listModel 
+                = new DefaultListModel<>();
         listModel.addAll(todosAutores);
         lstAutor.setModel(listModel);
     }
@@ -82,8 +83,10 @@ public class CadastroLivro extends javax.swing.JInternalFrame {
         // Pré-seleção de autores do livro corrente
         setSelectedValues(lstAutor, livroEdicao.getAutores());
 
-        DefaultListModel<Comentario> comentariosListModel = new DefaultListModel<>();
-        comentariosListModel.addAll(livroEdicao.getComentarios());
+        DefaultListModel<Comentario> comentariosListModel 
+                = new DefaultListModel<>();
+        comentariosListModel
+                .addAll(livroEdicao.getComentarios());
         lstComentarios.setModel(comentariosListModel);
     }
 
@@ -97,6 +100,8 @@ public class CadastroLivro extends javax.swing.JInternalFrame {
         if (self == null) {
             self = new CadastroLivro();
         }
+        
+        // TODO Carga de todas editoras e todos autores
 
         return self;
     }
@@ -108,9 +113,16 @@ public class CadastroLivro extends javax.swing.JInternalFrame {
      * @return The unique form
      */
     public static CadastroLivro getInstance(Livro livro) {
+        // TODO Carga de todas editoras e todos autores
+        
         // Caso a janela ainda não tenha sido instanciada
         if (self == null) {
             self = new CadastroLivro(livro);
+        } else {
+            // Correção de bug: o livro deve ser sempre atribuído 
+            // à instância existente para que a edição ocorra de 
+            // maneira adequada
+            self.livroEdicao = livro;
         }
 
         return self;
@@ -125,7 +137,8 @@ public class CadastroLivro extends javax.swing.JInternalFrame {
     protected void setSelectedValues(JList list, List<Autor> autores) {
         list.clearSelection();
         for (Autor autor : autores) {
-            int index = ((DefaultListModel) list.getModel()).indexOf(autor);
+            int index = ((DefaultListModel) list.getModel())
+                    .indexOf(autor);
             if (index >= 0) {
                 list.addSelectionInterval(index, index);
             }
@@ -452,7 +465,8 @@ public class CadastroLivro extends javax.swing.JInternalFrame {
         new ResenhaDao().salvar(resenha);
 
         // Autores selecionados para ligação ao livro
-        List<Autor> autoresSelecionados = lstAutor.getSelectedValuesList();
+        List<Autor> autoresSelecionados 
+                = lstAutor.getSelectedValuesList();
 
         // Exclusão de autores do livro
         for (Autor autor : livro.getAutores()) {
