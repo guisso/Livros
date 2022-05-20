@@ -22,7 +22,7 @@ import java.util.logging.Logger;
  * @author Luis Guisso <luis dot guisso at ifnmg dot edu dot br>
  * @version 0.1, 20/05/2022
  */
-public class LivroDao extends AbstractDao<Livro, Long> {
+public class LivroDao extends Dao<Livro, Long> {
 
     /**
      * Recupera a sentença SQL específica para a inserção da entidade no banco
