@@ -21,7 +21,7 @@ import java.util.logging.Logger;
  * @author Luis Guisso <luis dot guisso at ifnmg dot edu dot br>
  * @version 0.0.2, 22/08/2021
  */
-public class EditoraDao extends AbstractDao<Editora, Long> {
+public class EditoraDao extends Dao<Editora, Long> {
 
     /**
      * Recupera a sentença SQL específica para a inserção da entidade no banco
@@ -90,12 +90,13 @@ public class EditoraDao extends AbstractDao<Editora, Long> {
         // Tenta definir valores junto à sentença SQL preparada para execução 
         // no banco de dados.
         try {
-            if (editora.getId() == null || editora.getId() == 0) {
-                pstmt.setString(1, editora.getNome());
-            } else {
-                pstmt.setString(1, editora.getNome());
+            pstmt.setString(1, editora.getNome());
+            
+            if (editora.getId() != null
+                    && editora.getId() != 0) {
                 pstmt.setLong(2, editora.getId());
             }
+            
         } catch (SQLException ex) {
             Logger.getLogger(EditoraDao.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -143,16 +144,8 @@ public class EditoraDao extends AbstractDao<Editora, Long> {
         try {
             // ... entquanto houver registros a serem processados
             while (resultSet.next()) {
-                // Cria referência para montagem da editora
-                Editora editora = new Editora();
-
-                // Tenta recuperar dados do registro retornado pelo banco 
-                // de dados e ajustar o estado da editora a ser mapeada
-                editora.setId(resultSet.getLong("id"));
-                editora.setNome(resultSet.getString("nome"));
-
                 // Insere a editora na lista de editoras recuperadas
-                editoras.add(editora);
+                editoras.add(extrairObjeto(resultSet));
             }
         } catch (SQLException ex) {
             Logger.getLogger(EditoraDao.class.getName()).log(Level.SEVERE, null, ex);
