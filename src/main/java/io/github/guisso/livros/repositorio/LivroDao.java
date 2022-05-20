@@ -20,7 +20,7 @@ import java.util.logging.Logger;
  * Operações de persistência com a entidade Livro.
  *
  * @author Luis Guisso <luis dot guisso at ifnmg dot edu dot br>
- * @version 0.0.2, 22/08/2021
+ * @version 0.1, 20/05/2022
  */
 public class LivroDao extends AbstractDao<Livro, Long> {
 
@@ -93,27 +93,18 @@ public class LivroDao extends AbstractDao<Livro, Long> {
         // Tenta definir valores junto à sentença SQL preparada para execução 
         // no banco de dados.
         try {
-            if (livro.getId() == null || livro.getId() == 0) {
-//                "INSERT INTO livro (id, titulo, assunto, edicao, localpublicacao, anopublicacao, extensao, dtcadastro, editora_id) VALUES (default, ?, ?, ?, ?, ?, ?, default, ?);"
-                // IMPORTANTE: Valores nulos podem gerar exceções!
-                pstmt.setString(1, livro.getTitulo());
-                pstmt.setString(2, livro.getAssunto());
-                pstmt.setByte(3, livro.getEdicao());
-                pstmt.setString(4, livro.getLocalPublicacao());
-                pstmt.setShort(5, livro.getAnoPublicacao());
-                pstmt.setShort(6, livro.getExtensao());
-                pstmt.setLong(7, livro.getEditora().getId());
-            } else {
-//                "UPDATE livro SET titulo = ?, assunto = ?, edicao = ?, localpublicacao = ?, anopublicacao = ?, extensao = ?, editora_id = ?  WHERE id = ?;"
-                pstmt.setString(1, livro.getTitulo());
-                pstmt.setString(2, livro.getAssunto());
-                pstmt.setByte(3, livro.getEdicao());
-                pstmt.setString(4, livro.getLocalPublicacao());
-                pstmt.setShort(5, livro.getAnoPublicacao());
-                pstmt.setShort(6, livro.getExtensao());
-                pstmt.setLong(7, livro.getEditora().getId());
+            pstmt.setString(1, livro.getTitulo());
+            pstmt.setString(2, livro.getAssunto());
+            pstmt.setByte(3, livro.getEdicao());
+            pstmt.setString(4, livro.getLocalPublicacao());
+            pstmt.setShort(5, livro.getAnoPublicacao());
+            pstmt.setShort(6, livro.getExtensao());
+            pstmt.setLong(7, livro.getEditora().getId());
+
+            if (livro.getId() != null && livro.getId() != 0) {
                 pstmt.setLong(8, livro.getId());
             }
+
         } catch (SQLException ex) {
             Logger.getLogger(LivroDao.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -186,38 +177,11 @@ public class LivroDao extends AbstractDao<Livro, Long> {
         try {
             // ... enquanto houver registros a serem processados
             while (resultSet.next()) {
-                
-                // Cria referência para montagem do livro
-                Livro livro = new Livro();
-
-                // Cria referência para montagem do livro
-                livro.setId(resultSet.getLong("id"));
-                livro.setTitulo(resultSet.getString("titulo"));
-                livro.setAssunto(resultSet.getString("assunto"));
-                livro.setEdicao(resultSet.getByte("edicao"));
-                livro.setLocalPublicacao(resultSet.getString("localpublicacao"));
-                livro.setAnoPublicacao(resultSet.getShort("anopublicacao"));
-                livro.setExtensao(resultSet.getShort("extensao"));
-                livro.setDataCadastro(Util.convertDateToLocalDate(
-                        resultSet.getDate("dtcadastro")));
-
-                // Objetos provenientes de outras tabelas do banco de dados
-                Long editoraId = resultSet.getLong("editora_id");
-                livro.setEditora(new EditoraDao().localizarPorId(editoraId));
-
-                // TODO Localizar apenas os autores de um livro específico
-                livro.setAutores(new AutorDao().localizarTodos());
-
-                // TODO Localizar apenas os comentários de um livro específico
-                livro.setComentarios(new ComentarioDao().localizarTodos());
-
-                // A id do comentário (relacionamento um-para-um) é a mesma
-                // do próprio livro
-                livro.setResenha(new ResenhaDao().localizarPorId(livro.getId()));
 
                 // Insere o livro na lista de livros recuperados
-                livros.add(livro);
+                livros.add(extrairObjeto(resultSet));
             }
+
         } catch (SQLException ex) {
             Logger.getLogger(LivroDao.class.getName()).log(Level.SEVERE, null, ex);
         }
