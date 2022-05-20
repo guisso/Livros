@@ -22,7 +22,7 @@ import java.util.logging.Logger;
  * @author Luis Guisso <luis dot guisso at ifnmg dot edu dot br>
  * @version 0.0.2, 22/08/2021
  */
-public class ComentarioDao extends AbstractDao<Comentario, Long> {
+public class ComentarioDao extends Dao<Comentario, Long> {
 
     /**
      * Recupera todos os objetos mapeados para o banco de dados do tipo
@@ -37,14 +37,14 @@ public class ComentarioDao extends AbstractDao<Comentario, Long> {
         List<Comentario> comentarios = new ArrayList<>();
 
         // Tenta preparar uma sentença SQL para a conexão já estabelecida
-        try (PreparedStatement pstmt
+        try ( PreparedStatement pstmt
                 = ConexaoBd.getConexao().prepareStatement(
                         // Sentença SQL para recuperação de todos os registros
                         getDeclaracaoSelectComentariosPorLivro())) {
-            
+
             // Prepara a consulta com os parâmetros adequados
             pstmt.setLong(1, livro.getId());
-            
+
             // Executa o comando SQL
             ResultSet resultSet = pstmt.executeQuery();
 
@@ -59,7 +59,7 @@ public class ComentarioDao extends AbstractDao<Comentario, Long> {
         // ou a relação de objeto(s) recuperado(s)
         return comentarios;
     }
-    
+
     /**
      * Recupera a sentença SQL específica para a inserção da entidade no banco
      * de dados.
@@ -92,7 +92,7 @@ public class ComentarioDao extends AbstractDao<Comentario, Long> {
     public String getDeclaracaoSelectTodos() {
         return "SELECT * FROM comentario";
     }
-    
+
     /**
      * Recupera a sentença SQL específica para a busca das entidades no banco de
      * dados.
@@ -102,7 +102,6 @@ public class ComentarioDao extends AbstractDao<Comentario, Long> {
     private String getDeclaracaoSelectComentariosPorLivro() {
         return "SELECT * FROM comentario WHERE livro_id = ?";
     }
-
 
     /**
      * Recupera a sentença SQL específica para a atualização da entidade no
@@ -138,16 +137,15 @@ public class ComentarioDao extends AbstractDao<Comentario, Long> {
         // Tenta definir valores junto à sentença SQL preparada para execução 
         // no banco de dados.
         try {
-            if (comentario.getId() == null || comentario.getId() == 0) {
-                pstmt.setString(1, comentario.getAutor());
-                pstmt.setString(2, comentario.getTexto());
-                pstmt.setLong(3, comentario.getLivroId());
-            } else {
-                pstmt.setString(1, comentario.getAutor());
-                pstmt.setString(2, comentario.getTexto());
-                pstmt.setLong(3, comentario.getLivroId());
+            pstmt.setString(1, comentario.getAutor());
+            pstmt.setString(2, comentario.getTexto());
+            pstmt.setLong(3, comentario.getLivroId());
+
+            if (comentario.getId() != null
+                    && comentario.getId() != 0) {
                 pstmt.setLong(4, comentario.getId());
             }
+
         } catch (SQLException ex) {
             Logger.getLogger(ComentarioDao.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -197,18 +195,8 @@ public class ComentarioDao extends AbstractDao<Comentario, Long> {
         try {
             // ... entquanto houver registros a serem processados
             while (resultSet.next()) {
-                // Cria referência para montagem do comentario
-                Comentario comentario = new Comentario();
-
-                // Tenta recuperar dados do registro retornado pelo banco 
-                // de dados e ajustar o estado do comentario a ser mapeado
-                comentario.setId(resultSet.getLong("id"));
-                comentario.setAutor(resultSet.getString("autor"));
-                comentario.setTexto(resultSet.getString("texto"));
-                comentario.setLivroId(resultSet.getLong("livro_id"));
-
                 // Insere o comentario na lista de comentarios recuperados
-                comentarios.add(comentario);
+                comentarios.add(extrairObjeto(resultSet));
             }
         } catch (SQLException ex) {
             Logger.getLogger(ComentarioDao.class.getName()).log(Level.SEVERE, null, ex);
@@ -218,5 +206,5 @@ public class ComentarioDao extends AbstractDao<Comentario, Long> {
         // de dados
         return comentarios;
     }
-    
+
 }
