@@ -90,11 +90,10 @@ public class JanelaPrincipal extends javax.swing.JFrame {
 
     private void mnuCadastroLivroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuCadastroLivroActionPerformed
         // TODO Testes com edição de um livro específico
-        Livro livro = new LivroDao().localizarPorId(9L);
+//        Livro livro = new LivroDao().localizarPorId(7L);
+//        CadastroLivro interna = CadastroLivro.getInstance(livro);
         
-        
-        // Recupera uma instância visível e não-iconficada da janela
-        CadastroLivro interna = CadastroLivro.getInstance(livro);
+        CadastroLivro interna = CadastroLivro.getInstance();
 
         // Se a janela ainda não foi adicionada à área de trabalho...
         if (!Arrays
