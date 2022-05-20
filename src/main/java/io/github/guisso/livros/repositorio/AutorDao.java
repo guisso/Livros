@@ -21,7 +21,7 @@ import java.util.logging.Logger;
  * @author Luis Guisso <luis dot guisso at ifnmg dot edu dot br>
  * @version 0.0.2, 22/08/2021
  */
-public class AutorDao extends AbstractDao<Autor, Long> {
+public class AutorDao extends Dao<Autor, Long> {
 
     /**
      * Recupera a sentença SQL específica para a inserção da entidade no banco
@@ -90,10 +90,8 @@ public class AutorDao extends AbstractDao<Autor, Long> {
         // Tenta definir valores junto à sentença SQL preparada para execução 
         // no banco de dados.
         try {
-            if (autor.getId() == null || autor.getId() == 0) {
-                pstmt.setString(1, autor.getNome());
-            } else {
-                pstmt.setString(1, autor.getNome());
+            pstmt.setString(1, autor.getNome());
+            if (autor.getId() != null && autor.getId() != 0) {
                 pstmt.setLong(2, autor.getId());
             }
         } catch (SQLException ex) {
@@ -138,21 +136,13 @@ public class AutorDao extends AbstractDao<Autor, Long> {
 
         // Cria referência para inserção das autors a serem mapeados
         ArrayList<Autor> autores = new ArrayList<>();
-        
+
         // Tenta...
         try {
             // ... enquanto houver registros a serem processados
             while (resultSet.next()) {
-                // Cria referência para montagem do autor
-                Autor autor = new Autor();
-
-                // Tenta recuperar dados do registro retornado pelo banco 
-                // de dados e ajustar o estado do autor a ser mapeado
-                autor.setId(resultSet.getLong("id"));
-                autor.setNome(resultSet.getString("nome"));
-
                 // Insere o autor na lista de autores recuperados
-                autores.add(autor);
+                autores.add(extrairObjeto(resultSet));
             }
         } catch (SQLException ex) {
             Logger.getLogger(AutorDao.class.getName()).log(Level.SEVERE, null, ex);
