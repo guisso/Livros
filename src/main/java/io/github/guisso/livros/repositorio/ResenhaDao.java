@@ -19,9 +19,9 @@ import java.util.logging.Logger;
  * Operações de persistência com a entidade Editora.
  *
  * @author Luis Guisso <luis dot guisso at ifnmg dot edu dot br>
- * @version 0.0.2, 22/08/2021
+ * @version 0.1, 20/05/2022
  */
-public class ResenhaDao extends AbstractDao<Resenha, Long> {
+public class ResenhaDao extends Dao<Resenha, Long> {
 
     /**
      * Método com comportamento diferenciado do exposto na superclasse devido à
@@ -181,16 +181,8 @@ public class ResenhaDao extends AbstractDao<Resenha, Long> {
         try {
             // ... entquanto houver registros a serem processados
             while (resultSet.next()) {
-                // Cria referência para montagem da resenha
-                Resenha resenha = new Resenha();
-
-                // Tenta recuperar dados do registro retornado pelo banco 
-                // de dados e ajustar o estado da resenha a ser mapeada
-                resenha.setId(resultSet.getLong("id"));
-                resenha.setTexto(resultSet.getString("texto"));
-
                 // Insere a resenha na lista de resenhas recuperadas
-                resenhas.add(resenha);
+                resenhas.add(extrairObjeto(resultSet));
             }
         } catch (SQLException ex) {
             Logger.getLogger(ResenhaDao.class.getName()).log(Level.SEVERE, null, ex);
