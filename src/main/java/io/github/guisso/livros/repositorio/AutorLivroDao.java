@@ -22,7 +22,7 @@ import java.util.logging.Logger;
  * junção muitos-para-muitos entre as tabelas Autor e Livro.
  *
  * @author Luis Guisso <luis dot guisso at ifnmg dot edu dot br>
- * @version 0.0.2, 22/08/2021
+ * @version 0.1, 20/05/2022
  */
 public class AutorLivroDao {
 
@@ -81,7 +81,6 @@ public class AutorLivroDao {
                             getDeclaracaoDelete())) {
 
                 // Prepara a declaração com os dados do objeto passado
-                // TODO Ajustar a declaração preparada
                 pstmt.setLong(1, o.getAutorId());
                 pstmt.setLong(2, o.getLivroId());
 
@@ -279,16 +278,7 @@ public class AutorLivroDao {
         try {
             // ... enquanto houver registros a serem processados
             while (resultSet.next()) {
-                // Cria referência para montagem do autor-livro
-                AutorLivro autorLivro = new AutorLivro();
-
-                // Tenta recuperar dados do registro retornado pelo banco 
-                // de dados e ajustar o estado do autor-livro a ser mapeado
-                autorLivro.setAutorId(resultSet.getLong("autor_id"));
-                autorLivro.setLivroId(resultSet.getLong("livro_id"));
-
-                // Insere o autor-livro na lista de autores-livros recuperados
-                autoresLivros.add(autorLivro);
+                autoresLivros.add(extrairObjeto(resultSet));
             }
         } catch (SQLException ex) {
             Logger.getLogger(AutorLivroDao.class.getName()).log(Level.SEVERE, null, ex);
