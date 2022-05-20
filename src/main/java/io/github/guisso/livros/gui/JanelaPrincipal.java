@@ -103,7 +103,7 @@ public class JanelaPrincipal extends javax.swing.JFrame {
             dskPrincipal.add(interna);
         }
 
-        tornarVisivel(interna);
+        anexarJanela(interna);
 
     }//GEN-LAST:event_mnuCadastroLivroActionPerformed
 
@@ -112,7 +112,7 @@ public class JanelaPrincipal extends javax.swing.JFrame {
      *
      * @param janela Janela interna a ser ajustada
      */
-    private void tornarVisivel(JInternalFrame janela) {
+    private void anexarJanela(JInternalFrame janela) {
         // Verificação de janela válida
         if (janela == null) {
             return;
